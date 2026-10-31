@@ -14,16 +14,16 @@ import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 
-class Dsm(host: String, fingerprint: String) {
-    private val base = (if (host.startsWith("https://", ignoreCase = true)) host else "https://$host").trimEnd('/')
-        .toHttpUrl().also { require(it.isHttps && it.username.isEmpty() && it.password.isEmpty() && it.encodedPath == "/" && it.query == null && it.fragment == null) { "请输入 HTTPS 域名或 IP 及端口，不要包含路径" } }.toString().trimEnd('/')
+class Dsm(host: String, https: Boolean, fingerprint: String) {
+    private val base = (if (host.startsWith("https://", ignoreCase = true) || host.startsWith("http://", ignoreCase = true)) host else (if (https) "https://" else "http://") + host).trimEnd('/')
+        .toHttpUrl().also { require(it.isHttps == https && it.username.isEmpty() && it.password.isEmpty() && it.encodedPath == "/" && it.query == null && it.fragment == null) { "地址协议与开关必须一致，且不能包含路径" } }.toString().trimEnd('/')
     private var sid = ""
 
     // No custom trust is installed unless the user supplies an exact SHA-256 leaf certificate fingerprint.
     private val client: OkHttpClient = run {
         val builder = OkHttpClient.Builder().connectTimeout(8, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS).followRedirects(false).followSslRedirects(false)
-        if (fingerprint.isNotBlank()) {
+        if (https && fingerprint.isNotBlank()) {
             val normalized = fingerprint.replace(Regex("[\\s:]"), "").lowercase()
             require(normalized.matches(Regex("[0-9a-f]{64}"))) { "证书 SHA-256 指纹应为 64 位十六进制字符" }
             val tm = object : X509TrustManager {

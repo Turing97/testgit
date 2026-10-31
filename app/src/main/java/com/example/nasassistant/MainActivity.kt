@@ -54,6 +54,7 @@ fun App() {
 @Composable
 fun Login(onOk: (Dsm) -> Unit) {
     var host by remember { mutableStateOf("") }
+    var https by remember { mutableStateOf(false) }
     var fingerprint by remember { mutableStateOf("") }
     var user by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
@@ -67,13 +68,20 @@ fun Login(onOk: (Dsm) -> Unit) {
         Text("群晖助手", style = MaterialTheme.typography.headlineMedium)
         OutlinedTextField(
             host, { host = it }, Modifier.fillMaxWidth(), singleLine = true,
-            label = { Text("HTTPS 地址，如 nas.example.com:5001") }
+            label = { Text(if (https) "地址，如 nas.example.com:5001" else "地址，如 192.168.1.10:5000") }
         )
-        OutlinedTextField(
-            fingerprint, { fingerprint = it }, Modifier.fillMaxWidth(),
-            label = { Text("证书 SHA-256 指纹（自签证书时填写）") },
-            supportingText = { Text("仅填写已从群晖独立核对的指纹；留空使用系统证书验证。") }
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Switch(https, { https = it })
+            Spacer(Modifier.width(8.dp))
+            Text(if (https) "HTTPS 加密连接" else "HTTP 明文连接")
+        }
+        if (https) {
+            OutlinedTextField(
+                fingerprint, { fingerprint = it }, Modifier.fillMaxWidth(),
+                label = { Text("证书 SHA-256 指纹（自签证书时填写）") },
+                supportingText = { Text("仅填写已独立核对的指纹；留空使用系统证书验证。") }
+            )
+        } else Text("HTTP 会明文传输账号、密码和文件，建议仅在可信局域网使用。", color = MaterialTheme.colorScheme.error)
         OutlinedTextField(
             user, { user = it }, Modifier.fillMaxWidth(), singleLine = true,
             label = { Text("账号") }
@@ -88,7 +96,7 @@ fun Login(onOk: (Dsm) -> Unit) {
                 busy = true; err = ""
                 scope.launch {
                     try {
-                        val d = Dsm(host.trim(), fingerprint.trim())
+                        val d = Dsm(host.trim(), https, fingerprint.trim())
                         withContext(Dispatchers.IO) { d.login(user.trim(), pass) }
                         onOk(d)
                     } catch (e: Exception) {
