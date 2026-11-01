@@ -1,21 +1,52 @@
-name: Build APK
+name: Build Flutter NAS assistant
 on:
   push:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
-      - uses: gradle/actions/setup-gradle@v4
+          java-version: '11'
+      - uses: subosito/flutter-action@v2
         with:
-          gradle-version: "8.7"
-      - run: gradle assembleDebug --no-daemon
+          flutter-version: '3.7.12'
+          channel: stable
+          cache: true
+      - name: Prepare pinned upstream source
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --connect-timeout 30 --max-time 300 \
+            'https://gitee.com/apaipai/dsm_helper/repository/archive/cf03faa7e1e0000b1aa647ed975c4de64679bed4.zip' -o "$RUNNER_TEMP/upstream.zip"
+          mkdir -p "$RUNNER_TEMP/source"
+          unzip -q "$RUNNER_TEMP/upstream.zip" -d "$RUNNER_TEMP/source"
+          mapfile -t roots < <(find "$RUNNER_TEMP/source" -mindepth 1 -maxdepth 1 -type d)
+          test "${#roots[@]}" -eq 1
+          mv "${roots[0]}" app-src
+          tar -xzf overlay.tar.gz -C app-src
+          rm -f app-src/lib/models/setting/vip_record_model.dart app-src/lib/pages/setting/vip.dart app-src/lib/pages/setting/vip_login.dart app-src/lib/pages/setting/vip_record.dart
+          sed -i 's/applicationId "fit.flutter.dsm_helper"/applicationId "fit.flutter.dsm_helper.local"/' app-src/android/app/build.gradle
+          sed -i 's/android:label="群晖助手"/android:label="群晖助手测试版"/' app-src/android/app/src/main/AndroidManifest.xml
+      - name: Create temporary release signing key
+        working-directory: app-src
+        shell: bash
+        run: |
+          set -euo pipefail
+          keytool -genkeypair -keystore "$RUNNER_TEMP/test-release.jks" -alias test-release -storepass test-build-only -keypass test-build-only -keyalg RSA -keysize 2048 -validity 365 -dname 'CN=NAS Assistant Test Build' -noprompt
+          printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$RUNNER_TEMP/test-release.jks" test-build-only test-release test-build-only > android/key.properties
+      - name: Resolve dependencies and build release APK
+        working-directory: app-src
+        run: |
+          flutter pub get
+          flutter build apk --release --no-pub --no-tree-shake-icons
       - uses: actions/upload-artifact@v4
         with:
-          name: NAS-assistant-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: nas-assistant-flutter-release-test
+          path: app-src/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
