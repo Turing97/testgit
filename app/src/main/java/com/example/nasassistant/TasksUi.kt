@@ -41,7 +41,7 @@ fun TasksPanel(onClose: () -> Unit) {
     ) {
         Column(
             Modifier.align(Alignment.BottomCenter).fillMaxWidth().fillMaxHeight(0.84f).clip(shape)
-                .background(Brush.verticalGradient(listOf(Color(0xE0546AA8), Color(0xEB3E528C)))).border(1.dp, Color.White.copy(0.13f), shape)
+                .background(Brush.verticalGradient(listOf(Color(0xF02C383F), Color(0xF0182228)))).border(1.dp, Color.White.copy(0.13f), shape)
                 .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { }
                 .padding(horizontal = 20.dp)
         ) {
@@ -50,14 +50,14 @@ fun TasksPanel(onClose: () -> Unit) {
                     .size(44.dp, 5.dp).clip(CircleShape).background(Color.White.copy(0.3f))
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("下载任务", fontSize = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text("下载任务", fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 if (doing.isNotEmpty()) {
                     val anyRun = doing.any { it.state == Task.RUN || it.state == Task.WAIT }
                     PillButton(if (anyRun) "全部暂停" else "全部继续", { if (anyRun) Downloads.pauseAll() else Downloads.resumeAll() }, h = 38.dp)
                 }
             }
             Row(
-                Modifier.padding(top = 16.dp).fillMaxWidth().clip(CircleShape).background(Color(0x400F193C)).padding(4.dp)
+                Modifier.padding(top = 16.dp).fillMaxWidth().clip(CircleShape).background(Color(0x8010171B)).padding(4.dp)
             ) {
                 listOf("进行中 ${doing.size}", "已完成 ${done.size}").forEachIndexed { i, t ->
                     Box(

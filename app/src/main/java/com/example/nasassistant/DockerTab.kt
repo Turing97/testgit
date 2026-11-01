@@ -86,7 +86,7 @@ fun DockerTab(dsm: Dsm) {
             val stopped = shown.filter { !it.running }
             LazyColumn(
                 contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 150.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (err.isNotEmpty()) item { Text(err, color = Rose, fontSize = 13.sp) }
                 if (shown.isEmpty() && err.isEmpty()) {
@@ -169,7 +169,7 @@ private fun SvcRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Box(
-                Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(tileBrush(idx)),
+                Modifier.size(38.dp).clip(RoundedCornerShape(12.dp)).background(tileBrush(idx)),
                 contentAlignment = Alignment.Center
             ) { Text(s.name.take(1).uppercase(), fontSize = 18.sp, fontWeight = FontWeight.Bold) }
             Column(Modifier.weight(1f)) {

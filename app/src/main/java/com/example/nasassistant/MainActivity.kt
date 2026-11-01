@@ -33,6 +33,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +77,35 @@ fun fieldColors() = OutlinedTextFieldDefaults.colors(
     focusedTextColor = Color.White, unfocusedTextColor = Color.White
 )
 
+data class LoginRecord(val host: String, val user: String, val https: Boolean)
+
+fun readLoginHistory(prefs: android.content.SharedPreferences): List<LoginRecord> {
+    val records = mutableListOf<LoginRecord>()
+    try {
+        val items = JSONArray(prefs.getString("login_history", "[]"))
+        for (i in 0 until items.length()) {
+            val item = items.getJSONObject(i)
+            val host = item.optString("host")
+            val user = item.optString("user")
+            if (host.isNotBlank() && user.isNotBlank()) records.add(LoginRecord(host, user, item.optBoolean("https")))
+        }
+    } catch (_: Exception) { }
+    val host = prefs.getString("host", "").orEmpty()
+    val user = prefs.getString("user", "").orEmpty()
+    if (!prefs.contains("login_history") && host.isNotBlank() && user.isNotBlank()) {
+        records.add(LoginRecord(host, user, prefs.getBoolean("https", false)))
+    }
+    return records
+}
+
+fun writeLoginHistory(prefs: android.content.SharedPreferences, records: List<LoginRecord>) {
+    val items = JSONArray()
+    records.forEach { record ->
+        items.put(JSONObject().put("host", record.host).put("user", record.user).put("https", record.https))
+    }
+    prefs.edit().putString("login_history", items.toString()).apply()
+}
+
 @Composable
 fun Login(onOk: (Dsm) -> Unit) {
     val ctx = LocalContext.current
@@ -84,6 +115,8 @@ fun Login(onOk: (Dsm) -> Unit) {
     var fingerprint by remember { mutableStateOf("") }
     var user by remember { mutableStateOf(prefs.getString("user", "") ?: "") }
     var pass by remember { mutableStateOf("") }
+    var history by remember { mutableStateOf(readLoginHistory(prefs)) }
+    var showHistory by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var err by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -96,17 +129,37 @@ fun Login(onOk: (Dsm) -> Unit) {
         val logoShape = RoundedCornerShape(26.dp)
         Box(
             Modifier.size(92.dp).clip(logoShape)
-                .background(Brush.linearGradient(listOf(Color(0xFF3A4A78), Color(0xFF1B2B3A))))
+                .background(Brush.linearGradient(listOf(Color(0xFF3B474F), Color(0xFF202A30))))
                 .border(1.dp, Color.White.copy(0.2f), logoShape)
         ) {
             Image(painterResource(R.drawable.ic_launcher_foreground), null, Modifier.fillMaxSize())
         }
         Spacer(Modifier.height(16.dp))
-        Text("群晖助手", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        Text("群晖助手", fontSize = 26.sp, fontWeight = FontWeight.Bold)
         Text("连接你的 NAS", color = Sub, fontSize = 14.sp)
         Spacer(Modifier.height(28.dp))
         Glass(Modifier.fillMaxWidth(), radius = 28.dp) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (history.isNotEmpty()) {
+                    TextButton(onClick = { showHistory = !showHistory }) {
+                        Text(if (showHistory) "收起历史账号" else "选择历史账号 (${history.size})")
+                    }
+                    if (showHistory) history.forEach { record ->
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f).clickable {
+                                host = record.host; user = record.user; https = record.https
+                                pass = ""; fingerprint = ""; err = ""; showHistory = false
+                            }.padding(vertical = 8.dp)) {
+                                Text(record.user, fontSize = 14.sp, maxLines = 1)
+                                Text(record.host + if (record.https) " · HTTPS" else " · HTTP", color = Sub, fontSize = 12.sp, maxLines = 1)
+                            }
+                            TextButton(onClick = {
+                                history = history.filterNot { it == record }
+                                writeLoginHistory(prefs, history)
+                            }) { Text("删除") }
+                        }
+                    }
+                }
                 OutlinedTextField(
                     host, { host = it }, Modifier.fillMaxWidth(), singleLine = true,
                     shape = RoundedCornerShape(16.dp), colors = fieldColors(),
@@ -147,6 +200,9 @@ fun Login(onOk: (Dsm) -> Unit) {
                                 withContext(Dispatchers.IO) { d.login(user.trim(), pass) }
                                 prefs.edit().putString("host", h).putBoolean("https", https)
                                     .putString("user", user.trim()).apply()
+                                val record = LoginRecord(h, user.trim(), https)
+                                history = (listOf(record) + history.filterNot { it == record }).take(20)
+                                writeLoginHistory(prefs, history)
                                 onOk(d)
                             } catch (e: Exception) {
                                 err = e.message ?: "登录失败"

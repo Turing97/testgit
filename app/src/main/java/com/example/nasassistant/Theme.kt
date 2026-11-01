@@ -21,17 +21,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-val Accent = Color(0xFF7FE3FF)
-val Blue = Color(0xFF2AA0FF)
-val Lav = Color(0xFFD6C4FF)
+val Accent = Color(0xFF42E5B0)
+val Blue = Color(0xFF24C997)
+val Lav = Color(0xFF7DE7C7)
 val Amber = Color(0xFFF6D56B)
 val Green = Color(0xFF7FE0B0)
 val Rose = Color(0xFFFF9FA8)
 val Gold = Color(0xFFF2D36B)
 val Sub = Color(0xC2FFFFFF)
 
-val CoolBrush = Brush.horizontalGradient(listOf(Color(0xFF7FE3FF), Color(0xFF2AA0FF)))
-val LavBrush = Brush.horizontalGradient(listOf(Color(0xFFD6C4FF), Color(0xFF8F7BFF)))
+val CoolBrush = Brush.horizontalGradient(listOf(Color(0xFF42E5B0), Color(0xFF24C997)))
+val LavBrush = Brush.horizontalGradient(listOf(Color(0xFF7DE7C7), Color(0xFF28BE9A)))
 val WarmBrush = Brush.horizontalGradient(listOf(Color(0xFFF6E05A), Color(0xFFFF9A5A), Color(0xFFFF7A95)))
 
 @Composable
@@ -39,9 +39,9 @@ fun NasTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = darkColorScheme(
             primary = Accent, onPrimary = Color(0xFF0B2540),
-            background = Color(0xFF445A8C), surface = Color(0xFF445A8C),
+            background = Color(0xFF202A30), surface = Color(0xFF202A30),
             onSurface = Color.White, onSurfaceVariant = Color(0xFFDCE3F5),
-            surfaceContainerHigh = Color(0xFF3A4E84),
+            surfaceContainerHigh = Color(0xFF303B42),
             error = Rose
         ),
         content = content
@@ -52,34 +52,18 @@ fun NasTheme(content: @Composable () -> Unit) {
 fun GlassBackground(content: @Composable BoxScope.() -> Unit) {
     Box(
         Modifier.fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    0f to Color(0xFF6F88C0), 0.36f to Color(0xFF5068A0),
-                    0.68f to Color(0xFF445A8C), 1f to Color(0xFF5B709D)
-                )
-            )
-            .drawBehind {
-                fun orb(c: Color, cx: Float, cy: Float, r: Float) {
-                    drawCircle(
-                        Brush.radialGradient(listOf(c, Color.Transparent), center = Offset(cx, cy), radius = r),
-                        radius = r, center = Offset(cx, cy)
-                    )
-                }
-                orb(Color(0x3DFFFFFF), size.width * 0.2f, 0f, size.width * 0.95f)
-                orb(Color(0x6BD2DEFF), size.width * 0.95f, size.height * 0.02f, size.width * 0.75f)
-                orb(Color(0x807896D7), 0f, size.height * 0.97f, size.width * 0.85f)
-            },
+            .background(Brush.verticalGradient(listOf(Color(0xFF202B32), Color(0xFF151C20), Color(0xFF202A30)))),
         content = content
     )
 }
 
 @Composable
 fun Glass(
-    modifier: Modifier = Modifier, radius: Dp = 28.dp, light: Boolean = false,
+    modifier: Modifier = Modifier, radius: Dp = 18.dp, light: Boolean = false,
     content: @Composable BoxScope.() -> Unit
 ) {
     val shape = RoundedCornerShape(radius)
-    val fill = if (light) listOf(Color(0x8C82A0E1), Color(0x805A78C3)) else listOf(Color(0x94425892), Color(0x8534487E))
+    val fill = if (light) listOf(Color(0xE03B474F), Color(0xE02B363D)) else listOf(Color(0xE02D3940), Color(0xE0232D33))
     val b1 = Color.White.copy(if (light) 0.32f else 0.2f)
     val b2 = Color.White.copy(if (light) 0.16f else 0.08f)
     Box(
@@ -101,7 +85,7 @@ fun TabHeader(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Column(Modifier.weight(1f)) {
-            Text(title, fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
+            Text(title, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
             sub()
         }
         actions()
@@ -183,7 +167,7 @@ fun GlassBar(p: Float, color: Color, h: Dp = 8.dp) =
 
 @Composable
 fun glassSwitch() = SwitchDefaults.colors(
-    checkedTrackColor = Color(0xFF3DB4FF), checkedThumbColor = Color.White, checkedBorderColor = Color(0xFF3DB4FF),
+    checkedTrackColor = Color(0xFF42E5B0), checkedThumbColor = Color.White, checkedBorderColor = Color(0xFF42E5B0),
     uncheckedTrackColor = Color.White.copy(0.16f), uncheckedThumbColor = Color.White.copy(0.8f),
     uncheckedBorderColor = Color.White.copy(0.25f)
 )

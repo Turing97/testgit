@@ -78,7 +78,7 @@ fun AdminTab(dsm: Dsm) {
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         TabHeader("管理", sub = { SubText("电源 · 服务 · 用户与日志") }) { PillButton("刷新", { n++ }) }
-        Column(Modifier.padding(horizontal = 22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(horizontal = 22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Glass(Modifier.fillMaxWidth(), radius = 26.dp) {
                 Column(Modifier.padding(18.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -125,7 +125,7 @@ fun AdminTab(dsm: Dsm) {
             if (info.isNotEmpty()) Text(info, color = Amber, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 4.dp))
 
             Glass(Modifier.fillMaxWidth(), radius = 26.dp) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Row {
                         Text("在线用户", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                         SubText(if (users == null) "" else "${users!!.size} 人")
@@ -154,7 +154,7 @@ fun AdminTab(dsm: Dsm) {
             }
 
             Glass(Modifier.fillMaxWidth(), radius = 26.dp) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("最近日志", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                         Text("查看全部 ›", color = Sub, fontSize = 13.sp, modifier = Modifier.clickable { allLogs = true })
@@ -219,7 +219,7 @@ fun LogsScreen(dsm: Dsm, onBack: () -> Unit) {
         TabHeader("日志", sub = { SubText("最近 100 条") }) { PillButton("返回", onBack) }
         LazyColumn(
             contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 150.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (err.isNotEmpty()) item { Text(err, color = Rose, fontSize = 13.sp) }
             if (logs == null) item { Text("加载中…", color = Sub) }

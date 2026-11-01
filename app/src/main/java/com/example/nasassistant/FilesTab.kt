@@ -176,7 +176,7 @@ fun FilesTab(dsm: Dsm, path: String, onPath: (String) -> Unit, onTasks: () -> Un
         if (msg.isNotEmpty()) Text(msg, color = Rose, fontSize = 13.sp, modifier = Modifier.padding(start = 26.dp, top = 8.dp))
         LazyColumn(
             contentPadding = PaddingValues(start = 22.dp, end = 22.dp, top = 12.dp, bottom = 170.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(list) { f ->
                 val k = kindOf(f)
@@ -193,7 +193,7 @@ fun FilesTab(dsm: Dsm, path: String, onPath: (String) -> Unit, onTasks: () -> Un
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Box(
-                            Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(kindBrush(k)),
+                            Modifier.size(38.dp).clip(RoundedCornerShape(12.dp)).background(kindBrush(k)),
                             contentAlignment = Alignment.Center
                         ) { Icon(kindIcon(k), null, Modifier.size(22.dp)) }
                         Column(Modifier.weight(1f)) {
@@ -235,7 +235,7 @@ fun FilesTab(dsm: Dsm, path: String, onPath: (String) -> Unit, onTasks: () -> Un
             onDismissRequest = { },
             title = { Text("正在打开") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(o.name, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     if (o.total > 0) {
                         GlassBar((o.done.toFloat() / o.total), Accent, 8.dp)

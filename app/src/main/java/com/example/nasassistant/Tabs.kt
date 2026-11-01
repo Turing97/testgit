@@ -60,7 +60,7 @@ fun MetricCard(label: String, pct: Int, sub: String, brush: Brush, modifier: Mod
         Column(Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 18.dp, bottom = 20.dp)) {
             Text(label, color = Sub, fontSize = 15.sp)
             Spacer(Modifier.height(6.dp))
-            Text("$pct%", fontSize = 44.sp, fontWeight = FontWeight.Medium)
+            Text("$pct%", fontSize = 30.sp, fontWeight = FontWeight.Medium)
             Text(sub, color = Sub, fontSize = 14.sp)
             Spacer(Modifier.height(14.dp))
             Track(pct / 100f, brush)
@@ -75,7 +75,7 @@ fun DiskCard(d: Disk, modifier: Modifier) {
         Column(Modifier.fillMaxWidth().padding(18.dp)) {
             Text(d.name, color = Sub, fontSize = 15.sp)
             Spacer(Modifier.height(6.dp))
-            Text("${d.temp}°", fontSize = 44.sp, fontWeight = FontWeight.Medium)
+            Text("${d.temp}°", fontSize = 30.sp, fontWeight = FontWeight.Medium)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                 Dot(if (ok) Green else Rose)
                 Text(if (ok) "正常" else d.status, color = Sub, fontSize = 13.sp, maxLines = 1)
@@ -171,13 +171,13 @@ fun OverviewTab(dsm: Dsm, onLogout: () -> Unit) {
             }
         }) { PillButton("退出", onLogout) }
 
-        Column(Modifier.padding(horizontal = 20.dp).padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(horizontal = 20.dp).padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Glass(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(horizontal = 22.dp, vertical = 20.dp)) {
+                Column(Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
                     Text("NAS 状态", color = Sub, fontSize = 15.sp)
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        heroTitle, fontSize = 38.sp, fontWeight = FontWeight.Medium,
+                        heroTitle, fontSize = 27.sp, fontWeight = FontWeight.Medium,
                         color = if (vl != null && attention) Amber else if (vl != null) Green else Color.White
                     )
                     if (heroSub.isNotEmpty()) Text(heroSub, color = Sub, fontSize = 14.sp)
@@ -204,11 +204,11 @@ fun OverviewTab(dsm: Dsm, onLogout: () -> Unit) {
                     Text("网络", color = Sub, fontSize = 15.sp)
                     Box(Modifier.padding(vertical = 12.dp).fillMaxWidth().height(1.dp).background(Color.White.copy(0.14f)))
                     Row {
-                        Text("↓ ${fmt(rx)}/s", fontSize = 21.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-                        Text("↑ ${fmt(tx)}/s", fontSize = 21.sp, fontWeight = FontWeight.Medium)
+                        Text("↓ ${fmt(rx)}/s", fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                        Text("↑ ${fmt(tx)}/s", fontSize = 16.sp, fontWeight = FontWeight.Medium)
                     }
                     Spacer(Modifier.height(8.dp))
-                    Canvas(Modifier.fillMaxWidth().height(92.dp)) {
+                    Canvas(Modifier.fillMaxWidth().height(60.dp)) {
                         val w = size.width
                         val h = size.height
                         val pad = 8.dp.toPx()
@@ -235,7 +235,7 @@ fun OverviewTab(dsm: Dsm, onLogout: () -> Unit) {
             val vv = vl ?: emptyList()
             if (vv.isNotEmpty()) {
                 Glass(Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(horizontal = 22.dp, vertical = 20.dp)) {
+                    Column(Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
                         Row {
                             Text("存储空间", color = Sub, fontSize = 15.sp, modifier = Modifier.weight(1f))
                             Text("${vv.size} 个卷", color = Sub, fontSize = 14.sp)
