@@ -29,7 +29,7 @@ jobs:
           test "${#roots[@]}" -eq 1
           mv "${roots[0]}" app-src
           tar -xzf overlay.tar.gz -C app-src
-          rm -f app-src/lib/models/setting/vip_record_model.dart app-src/lib/pages/setting/vip.dart app-src/lib/pages/setting/vip_login.dart app-src/lib/pages/setting/vip_record.dart app-src/lib/pages/setting/feedback.dart app-src/lib/pages/setting/about.dart
+          rm -f app-src/lib/models/setting/vip_record_model.dart app-src/lib/pages/setting/vip.dart app-src/lib/pages/setting/vip_login.dart app-src/lib/pages/setting/vip_record.dart app-src/lib/pages/setting/feedback.dart app-src/lib/pages/setting/about.dart app-src/lib/pages/setting/license.dart app-src/lib/pages/setting/reward.dart app-src/lib/models/setting/group_model.dart app-src/lib/pages/update/update.dart app-src/lib/widgets/update_dialog.dart
           sed -i 's/applicationId "fit.flutter.dsm_helper"/applicationId "fit.flutter.dsm_helper.local"/' app-src/android/app/build.gradle
       - name: Create temporary release signing key
         working-directory: app-src
