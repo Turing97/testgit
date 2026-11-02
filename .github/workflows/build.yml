@@ -29,9 +29,8 @@ jobs:
           test "${#roots[@]}" -eq 1
           mv "${roots[0]}" app-src
           tar -xzf overlay.tar.gz -C app-src
-          rm -f app-src/lib/models/setting/vip_record_model.dart app-src/lib/pages/setting/vip.dart app-src/lib/pages/setting/vip_login.dart app-src/lib/pages/setting/vip_record.dart
+          rm -f app-src/lib/models/setting/vip_record_model.dart app-src/lib/pages/setting/vip.dart app-src/lib/pages/setting/vip_login.dart app-src/lib/pages/setting/vip_record.dart app-src/lib/pages/setting/feedback.dart app-src/lib/pages/setting/about.dart
           sed -i 's/applicationId "fit.flutter.dsm_helper"/applicationId "fit.flutter.dsm_helper.local"/' app-src/android/app/build.gradle
-          sed -i 's/android:label="群晖助手"/android:label="群晖助手测试版"/' app-src/android/app/src/main/AndroidManifest.xml
       - name: Create temporary release signing key
         working-directory: app-src
         shell: bash
@@ -44,9 +43,24 @@ jobs:
         run: |
           flutter pub get
           flutter build apk --release --no-pub --no-tree-shake-icons
+      - name: Verify Android manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          aapt=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          test -n "$aapt"
+          "$aapt" dump xmltree app-src/build/app/outputs/flutter-apk/app-release.apk AndroidManifest.xml > "$RUNNER_TEMP/manifest.txt"
+          grep -q 'fit.flutter.dsm_helper.MainActivity' "$RUNNER_TEMP/manifest.txt"
+          if grep -q 'com.techind.flutter_sharing_intent.MainActivity' "$RUNNER_TEMP/manifest.txt"; then
+            echo 'Unexpected duplicate share activity in APK' >&2
+            exit 1
+          fi
+          "$aapt" dump badging app-src/build/app/outputs/flutter-apk/app-release.apk > "$RUNNER_TEMP/badging.txt"
+          grep -F "application-label:'群晖助手'" "$RUNNER_TEMP/badging.txt"
+          grep -E '^(package:|application-label:)' "$RUNNER_TEMP/badging.txt"
       - uses: actions/upload-artifact@v4
         with:
-          name: nas-assistant-flutter-release-test
+          name: nas-assistant-flutter-release
           path: app-src/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 30
